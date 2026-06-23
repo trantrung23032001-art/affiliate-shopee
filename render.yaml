@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: affiliate-shopee
+    runtime: node
+    plan: free
+    branch: main
+    rootDir: .
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://affiliate-shopee.onrender.com
+      - key: AFFILIATE_ID
+        value: "17347380269"
+      - key: FACEBOOK_POST_URL
+        value: https://www.facebook.com/share/p/1CzBZuFbW4/?mibextid=wwXIfr
+      - key: ZALO_NOTIFY_GROUP_URL
+        value: https://zalo.me/84378960955
+      - key: SUB_ID
+        value: "-----"
