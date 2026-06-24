@@ -17,6 +17,12 @@ export default function ConvertForm() {
   const [copied, setCopied] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Mã giảm giá (có thể fetch từ API hoặc config)
+  const discountCodes = [
+    { id: 1, status: "available", platform: "INSTAGRAM", label: "Còn nhiều", color: "green" },
+    { id: 2, status: "expired", platform: "FACEBOOK", label: "Đã hết", color: "red" },
+  ];
+
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
@@ -324,62 +330,77 @@ export default function ConvertForm() {
         </div>
       )}
 
-      {/* Mã giảm giá */}
-      <div className="mt-8">
-        <h2 className="text-center text-base font-extrabold text-slate-700 mb-4">
-          MÃ GIẢM GIÁ
-        </h2>
+      {/* Mã giảm giá - chỉ hiện sau khi chuyển đổi xong */}
+      {result && (
+        <div className="mt-8 animate-fade-in">
+          <h2 className="text-center text-base font-extrabold text-slate-700 mb-4">
+            MÃ GIẢM GIÁ
+          </h2>
 
-        {/* Thông báo hướng dẫn */}
-        <div className="rounded-2xl bg-blue-50 border border-blue-200 p-4 mb-4">
-          <h3 className="text-sm font-semibold text-blue-800 mb-2">
-            Hướng dẫn
-          </h3>
-          <p className="text-sm text-blue-700 leading-relaxed font-bold">
-            !! ĐỔI LINK XONG BẤM MUA NGAY LÀ ĐÃ TỰ ÁP MÃ KO CẦN PHẢI COMMENT NỮA
-          </p>
-        </div>
-
-        {/* Danh sách mã giảm giá */}
-        <div className="space-y-3">
-          {/* Mã còn nhiều */}
-          <div className="bg-white rounded-xl p-3.5 shadow-sm border border-slate-100">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="shrink-0 w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center text-xs">✓</span>
-                <span className="text-sm font-bold text-slate-700">[Còn nhiều] MÃ INSTAGRAM</span>
-              </div>
-              <button
-                type="button"
-                aria-label="Mua ngay với mã Instagram"
-                className="shrink-0 flex items-center justify-center gap-2 rounded-full bg-green-500 px-4 py-2.5 text-sm font-bold text-white cursor-pointer select-none transition-all duration-150 active:scale-95 active:brightness-90 shadow-md shadow-green-200/50 hover:shadow-lg"
-              >
-                <span>🛒</span>
-                <span>Mua Ngay</span>
-              </button>
-            </div>
+          {/* Thông báo hướng dẫn */}
+          <div className="rounded-2xl bg-blue-50 border border-blue-200 p-4 mb-4">
+            <h3 className="text-sm font-semibold text-blue-800 mb-2">
+              Hướng dẫn
+            </h3>
+            <p className="text-sm text-blue-700 leading-relaxed font-bold">
+              !! ĐỔI LINK XONG BẤM MUA NGAY LÀ ĐÃ TỰ ÁP MÃ KO CẦN PHẢI COMMENT NỮA
+            </p>
           </div>
 
-          {/* Mã đã hết */}
-          <div className="bg-white rounded-xl p-3.5 shadow-sm border border-slate-100 opacity-60">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="shrink-0 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center text-xs">✕</span>
-                <span className="text-sm font-bold text-slate-500">[Đã hết] MÃ FACEBOOK</span>
-              </div>
-              <button
-                type="button"
-                disabled
-                aria-label="Đã hết mã"
-                className="shrink-0 flex items-center justify-center gap-2 rounded-full bg-slate-300 px-4 py-2.5 text-sm font-bold text-white cursor-not-allowed select-none"
+          {/* Danh sách mã giảm giá */}
+          <div className="space-y-3">
+            {discountCodes.map((code) => (
+              <div
+                key={code.id}
+                className={`bg-white rounded-xl p-3.5 shadow-sm border border-slate-100 ${
+                  code.status === "expired" ? "opacity-50" : ""
+                }`}
               >
-                <span>🛒</span>
-                <span>Mua Ngay</span>
-              </button>
-            </div>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`shrink-0 w-5 h-5 rounded-full text-white flex items-center justify-center text-xs ${
+                        code.color === "green" ? "bg-green-500" : "bg-red-500"
+                      }`}
+                    >
+                      {code.status === "available" ? "✓" : "✕"}
+                    </span>
+                    <span
+                      className={`text-sm font-bold ${
+                        code.status === "available"
+                          ? "text-slate-700"
+                          : "text-slate-500"
+                      }`}
+                    >
+                      [{code.label}] MÃ {code.platform}
+                    </span>
+                  </div>
+                  {code.status === "available" ? (
+                    <button
+                      type="button"
+                      aria-label={`Mua ngay với mã ${code.platform}`}
+                      className="shrink-0 flex items-center justify-center gap-2 rounded-full bg-green-500 px-4 py-2.5 text-sm font-bold text-white cursor-pointer select-none transition-all duration-150 active:scale-95 active:brightness-90 shadow-md shadow-green-200/50 hover:shadow-lg"
+                    >
+                      <span>🛒</span>
+                      <span>Mua Ngay</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      aria-label="Đã hết mã"
+                      className="shrink-0 flex items-center justify-center gap-2 rounded-full bg-slate-300 px-4 py-2.5 text-sm font-bold text-white cursor-not-allowed select-none"
+                    >
+                      <span>🛒</span>
+                      <span>Mua Ngay</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      )}
 
       {/* Liên hệ & Trợ giúp */}
       <div className="mt-8">
